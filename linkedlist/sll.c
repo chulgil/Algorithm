@@ -45,8 +45,14 @@ void traverse(node* item, callback f) {
 */
 void display(node* n)
 {
-    if(n != NULL)
+    if(n != NULL) {
         printf("%d ", n->data);
+        if(n->next == NULL) {
+            printf("-> NULL \n");
+        }
+    }
+        
+
 }
 
 node* create(node* item, int data) {

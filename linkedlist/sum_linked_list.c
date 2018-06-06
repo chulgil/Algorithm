@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "sll.c"
 
+typedef struct __storage {
+    int carry;
+    node* result;
+} Storage;
 
 node* sumLinks(node* l1, node* l2, int carry) {
     if(l1 == NULL && l2 == NULL && carry == 0) return NULL;
@@ -25,29 +29,35 @@ node* sumLinks(node* l1, node* l2, int carry) {
     return result;
 }
 
-
-node* addSum(node* l1, node* l2) {
+Storage* addSum(node* l1, node* l2) {
     if(l1 == NULL && l2 == NULL) {
-        printf("\naddSUM: NULL");
-        node* s = create(NULL, 0);
+        Storage* s = (Storage *)malloc(sizeof(Storage));
+        s->carry = 0;
+        s->result = NULL;
         return s;
     }
-    node* s = addSum(l1->next, l2->next);
-    int value = s->data + l1->data + l2->data;
-    s->data = value / 10;
-    s->next = append(s, value % 10);
-    printf("\n%d", s->data);
+    
+    Storage* s = addSum(l1->next, l2->next);
+    int value = s->carry + l1->data + l2->data;
+    s->carry = value / 10;
+    node *p = prepend(s->result, value % 10);
+    s->result = p;
     return s;
 }
 
 node* sumReverse(node* l1, node* l2) {
     l1 = leftPad(l1, getLength(l2));
     l2 = leftPad(l2, getLength(l1));
-    node* result = addSum(l1,l2);
-    return result->next;
+    callback disp = display;
+
+    traverse(l1, disp);
+    traverse(l2, disp);
+    Storage* s = addSum(l1,l2);
+    if(s->carry >= 1) {
+        s->result = prepend(s->result, s->carry);
+    }
+    return s->result;
 }
-
-
 
 int main() {
 
@@ -62,6 +72,9 @@ int main() {
     
     int arrList1[] = {1,9,4};
     int arrList2[] = {3,4,6,5,9};
+    
+    // int arrList1[] = {7,2,1,9,4};
+    // int arrList2[] = {3,4,6,5,9};
                 
     for(int i=0; i<CNT(arrList1); i++) {
         head1 = append(head1, arrList1[i]);
@@ -69,9 +82,6 @@ int main() {
     for(int i=0; i<CNT(arrList2); i++) {
         head2 = append(head2, arrList2[i]);
     }
-
     node* r = sumReverse(head1, head2);
     traverse(r, disp);
-    
-    // traverse(r, disp);
 }
